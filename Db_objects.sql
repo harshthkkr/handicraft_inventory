@@ -3,6 +3,11 @@ DROP TABLE IF EXISTS dbo.[Subproduct_RM_usage]
 DROP TABLE IF EXISTS dbo.[Product_RM_usage]
 DROP TABLE IF EXISTS dbo.[Raw_material_supplier_relation]
 DROP TABLE IF EXISTS dbo.[Supplier]
+alter table dbo.[Transaction] 
+SET (SYSTEM_VERSIONING = OFF)
+alter table dbo.[Transaction_details] 
+SET (SYSTEM_VERSIONING = OFF)
+
 DROP TABLE IF EXISTS dbo.Payment
 DROP TABLE IF EXISTS dbo.[Transaction_details]
 DROP TABLE IF EXISTS dbo.[Sub_Product]
@@ -148,61 +153,81 @@ VALUES
 	--JOIN product_rm_usage r ON r.product_id =p.product_id
 	--JOIN raw_material rm ON rm.rawmaterial_id=r.rawmaterial_id
 
-DROP TABLE IF EXISTS dbo.[Transaction] 
-CREATE TABLE dbo.[Transaction] (
-  [Trx_id] INT IDENTITY(1,1),
-  [Member_id] INT NOT NULL,
-  [Product_id] INT   NULL,
-  [subproduct_id] INT  NULL,
-  [Required_Qty] INT  NOT NULL,
-  [Total_Weight given] decimal(18,2)  NOT NULL,
-  [Total_weight_recieved] decimal(18,2)  NULL,
-  [Recieved_qty] INT NULL,
-  [Order_datte] DATETIME  NOT NULL,
-  [Return_date] DATETIME  NOT NULL,
-  [Actual_return_date] DATETIME NULL,
-  [Valid_From] DATETIME  NOT NULL,
-  [Valide_to] DATETIME  NOT NULL,
-  [Is_completed] BIT NOT NULL,
-  [Calculated_Piece_Labor_Rate] DECIMAL(18,2) NOT NULL,
-  [Actual_piece_labor rate] DECIMAL (18,2) NOT NULL,
-  [Total_Actual_Amount] decimal(18,2) NOT NULL,
-  PRIMARY KEY ([Trx_id]),
-  CONSTRAINT [FK_Transaction.Member_id]
-    FOREIGN KEY ([Member_id])
-      REFERENCES [Member]([Member_id]),
-  CONSTRAINT [FK_Transaction.Product_id]
-    FOREIGN KEY ([Product_id])
-      REFERENCES [Product]([Product_Id])
-);
-
-ALTER TABLE dbo.[Transaction] ADD CONSTRAINT DF_Transaction_Valid_from  DEFAULT GETDATE() FOR [Valid_from] 
-ALTER TABLE dbo.[Transaction] ADD CONSTRAINT DF_Transaction_Valid_to  DEFAULT GETDATE() FOR [Valide_to] 
 
 
-DROP TABLE IF EXISTS dbo.[Transaction_History] 
-CREATE TABLE dbo.[Transaction_History] (
-  [Trx_id] INT IDENTITY(1,1),
-  [Member_id] INT NOT NULL,
-  [Product_id] INT  NULL,
-  [subproduct_id] INT NULL,
-  [Required_Qty] INT NOT NULL,
-  [Total_Weight given] decimal(18,2) NOT NULL,
-  [Total_weight_recieved] decimal(18,2) NULL,
-  [Recieved_qty] INT NULL,
-  [Order_datte] DATETIME NOT NULL,
-  [Return_date] DATETIME NOT NULL,
-  [Actual_return_date] DATETIME NULL,
-  [Is_completed] BIT NOT NULL,
-  [Calculated_Piece_Labor_Rate] DECIMAL(18,2) NOT NULL,
-  [Actual_piece_labor rate] DECIMAL(18,2)  NOT NULL,
-  [Total_Actual Amount] decimal(18,2)  NOT NULL,
-  [Valid_From] DATETIME  NOT NULL,
-  [Valid_to] DATETIME  NOT NULL,
-  CONSTRAINT [FK_Transaction_History.Trx_id]
-    FOREIGN KEY ([Trx_id])
-      REFERENCES [Transaction]([Trx_id])
-);
+/** Object:  Table [dbo].[Transaction]    Script Date: 1/12/2023 10:04:59 PM **/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Transaction](
+	[Trx_id] [INT] IDENTITY(1,1) NOT NULL,
+	[Member_id] [INT] NOT NULL,
+	[Product_id] [INT] NULL,
+	[subproduct_id] [INT] NULL,
+	[Required_Qty] [INT] NOT NULL,
+	[Total_Weight given] [DECIMAL](18, 2) NOT NULL,
+	[Total_weight_recieved] [DECIMAL](18, 2) NULL,
+	[Recieved_qty] [INT] NULL,
+	[Order_date] [DATETIME] NOT NULL,
+	[Return_date] [DATETIME] NOT NULL,
+	[Actual_return_date] [DATETIME] NULL,
+	[Is_completed] [BIT] NOT NULL,
+	[Piece_Labor_Rate] [DECIMAL](18, 2) NOT NULL,
+	[Actual_piece_labor rate] [DECIMAL](18, 2) NOT NULL,
+	[Total_Actual_Amount] [DECIMAL](18, 2) NOT NULL,
+	[ValidFrom] [DATETIME2](7) GENERATED ALWAYS AS ROW START NOT NULL,
+	[ValidTo] [DATETIME2](7) GENERATED ALWAYS AS ROW END NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Trx_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+	PERIOD FOR SYSTEM_TIME ([ValidFrom], [ValidTo])
+) ON [PRIMARY]
+WITH
+(
+SYSTEM_VERSIONING = ON ( HISTORY_TABLE = [dbo].[Transaction_History] )
+)
+GO
+
+ALTER TABLE [dbo].[Transaction]  WITH CHECK ADD  CONSTRAINT [FK_Transaction.Member_id] FOREIGN KEY([Member_id])
+REFERENCES [dbo].[Member] ([Member_id])
+GO
+
+ALTER TABLE [dbo].[Transaction] CHECK CONSTRAINT [FK_Transaction.Member_id]
+GO
+
+ALTER TABLE [dbo].[Transaction]  WITH CHECK ADD  CONSTRAINT [FK_Transaction.Product_id] FOREIGN KEY([Product_id])
+REFERENCES [dbo].[Product] ([Product_Id])
+GO
+
+ALTER TABLE [dbo].[Transaction] CHECK CONSTRAINT [FK_Transaction.Product_id]
+GO
+
+
+
+INSERT INTO [dbo].[Transaction]
+           ([Member_id]
+           ,[Product_id]
+           ,[subproduct_id]
+           ,[Required_Qty]
+           ,[Total_Weight given]
+           ,[Total_weight_recieved]
+           ,[Recieved_qty]
+           ,[Order_date]
+           ,[Return_date]
+           ,[Actual_return_date]
+           ,[Is_completed]
+           ,[Piece_Labor_Rate]
+           ,[Actual_piece_labor rate]
+           ,[Total_Actual_Amount])
+     VALUES
+           (1,1,NULL,10,15,NULL,NULL,GETDATE(),GETDATE()+15,NULL,0,15,17,1500)
+GO
+
+
 
 --ALTER TABLE dbo.[Transaction_History] ADD CONSTRAINT DF_Transaction_History_Created_at  DEFAULT GETDATE() FOR [Created_at] 
 --ALTER TABLE dbo.[Transaction_History] ADD CONSTRAINT DF_Transaction_History_Updated_at  DEFAULT GETDATE() FOR [Updated_at] 
@@ -363,11 +388,13 @@ CREATE TABLE dbo.[Transaction_details] (
   [Required_qty] decimal(18,2) NOT NULL,
   [Given_qty] decimal(18,2) NOT NULL,
   [Is_pending] BIT NOT NULL,
-  [created_at] DATETIME NOT NULL,
-  [Updated_at] DATETIME NOT NULL,
+  [ValidFrom] [DATETIME2](7) GENERATED ALWAYS AS ROW START NOT NULL,
+  [ValidTo] [DATETIME2](7) GENERATED ALWAYS AS ROW END NOT NULL,
+  PERIOD FOR SYSTEM_TIME ([ValidFrom], [ValidTo]),
+  
   PRIMARY KEY ([Trxdetails_id]),
   CONSTRAINT [FK_Transaction_details.Trxdetails_id]
-    FOREIGN KEY ([Trxdetails_id])
+    FOREIGN KEY ([Trx_id])
       REFERENCES [Transaction]([Trx_id]),
   CONSTRAINT [FK_Transaction_details.Rawmaterial_id]
     FOREIGN KEY ([Rawmaterial_id])
@@ -375,11 +402,31 @@ CREATE TABLE dbo.[Transaction_details] (
   CONSTRAINT [FK_Transaction_details.subproduct_id]
     FOREIGN KEY ([subproduct_id])
       REFERENCES [Sub_Product]([SubProduct_Id])
-);
+	  ) 
+	  WITH
+(
+SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[Transaction_details_history] )
+)
 
-ALTER TABLE dbo.[Transaction_details] ADD CONSTRAINT DF_Transaction_details_Created_at  DEFAULT GETDATE() FOR [Created_at] 
-ALTER TABLE dbo.[Transaction_details] ADD CONSTRAINT DF_Transaction_details_Updated_at  DEFAULT GETDATE() FOR [Updated_at]
 
+INSERT INTO dbo.Transaction_details
+(
+    Trx_id,
+    Rawmaterial_id,
+    subproduct_id,
+    Required_qty,
+    Given_qty,
+    Is_pending
+)
+VALUES
+(   1,       -- Trx_id - int
+    1,       -- Rawmaterial_id - int
+    1,       -- subproduct_id - int
+    1,    -- Required_qty - decimal(18, 2)
+    50,    -- Given_qty - decimal(18, 2)
+    0   -- Is_pending - bit
+    )
+	
 
 DROP TABLE IF EXISTS dbo.Payment
 CREATE TABLE dbo.[Payment] (
@@ -507,3 +554,4 @@ VALUES
     1,   -- SubProduct_id - int
     2 -- Required_qty - decimal(18, 2)
     )
+    
