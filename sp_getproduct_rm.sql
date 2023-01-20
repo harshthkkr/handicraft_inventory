@@ -1,5 +1,5 @@
 
-CREATE OR ALTER PROC sp_getproduct_rm_sp (@product_id INT,@Qty int)
+CREATE OR ALTER PROC sp_getproduct_rm (@product_id INT,@Qty int)
 AS 
 
 --DECLARE  @product_id INT =1
@@ -43,4 +43,4 @@ SELECT * FROM #product_rm_sp
 
 END
 
-EXEC sp_getproduct_rm_sp @product_id=1,@qty=10
+EXEC sp_getproduct_rm @product_id=1,@qty=10
