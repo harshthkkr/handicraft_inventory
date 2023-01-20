@@ -1,0 +1,38 @@
+
+CREATE OR ALTER PROC sp_getsubproduct_rm (@subproduct_id INT,@Qty int)
+AS 
+
+--DECLARE  @product_id INT =1
+--,@Qty INT =10
+
+BEGIN
+
+DROP TABLE IF EXISTS #subproduct_rm
+
+CREATE  TABLE #subproduct_rm (
+product_name VARCHAR(30),
+type VARCHAR(30),
+Material VARCHAR(30),
+Required_qty INT,
+unit_type VARCHAR(30))
+
+INSERT INTO #subproduct_rm
+(
+    product_name,
+    type,
+    Material,
+    Required_qty
+	,unit_type
+)
+
+SELECT sp.Name AS product_name,'Rawmaterial' AS type,r.Name AS Material,SPR.Required_qty*@Qty,mu.unit_type FROM
+ dbo.Sub_Product sp
+ JOIN dbo.Subproduct_RM_usage SPR ON sp.subProduct_Id = SPR.Subproduct_id
+ JOIN dbo.Raw_Material r ON r.Rawmaterial_Id=Spr.Rawmaterial_id
+ JOIN dbo.Measurement_unit mu ON mu.unit_id=r.unit_id
+WHERE SP.SubProduct_Id =@subproduct_id
+
+
+SELECT * FROM #subproduct_rm
+
+END
