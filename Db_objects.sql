@@ -288,6 +288,8 @@ ALTER TABLE dbo.[Raw_Material] ADD CONSTRAINT DF_Raw_material_Product_Created_at
 ALTER TABLE dbo.[Raw_Material] ADD CONSTRAINT DF_Raw_material_Product_Updated_at  DEFAULT GETDATE() FOR [Updated_at]
 ALTER TABLE dbo.[Raw_Material] ADD CONSTRAINT DF_Raw_material_Product_Active DEFAULT 1 FOR Active
 
+
+
 INSERT INTO dbo.Raw_Material
 (
     Name,
@@ -349,6 +351,7 @@ CREATE TABLE dbo.[Sub_Product] (
   [Active] BIT NOT NULL,
   [Location_id] INT NOT NULL,
   [image_url] VARBINARY NULL,
+  [unit_id] INT NOT NULL,
   [Labour rate] INT NOT NULL,
   PRIMARY KEY ([SubProduct_Id])
 );
@@ -356,6 +359,12 @@ CREATE TABLE dbo.[Sub_Product] (
 ALTER TABLE dbo.[Sub_Product] ADD CONSTRAINT DF_Sub_Product_Created_at  DEFAULT GETDATE() FOR [Created_at] 
 ALTER TABLE dbo.[Sub_Product] ADD CONSTRAINT DF_Sub_Product_Updated_at  DEFAULT GETDATE() FOR [Updated_at]
 ALTER TABLE dbo.[Sub_Product] ADD CONSTRAINT DF_Sub_Product_Active DEFAULT 1 FOR Active
+
+ALTER TABLE dbo.Sub_Product
+ADD
+CONSTRAINT [FK_Sub_Product.subproduct_id]
+    FOREIGN KEY (unit_id)
+      REFERENCES [Measurement_unit]([unit_id])
 
 INSERT INTO dbo.Sub_Product
 (
@@ -366,6 +375,7 @@ INSERT INTO dbo.Sub_Product
     Updated_at,
     Location_id,
     image_url,
+	[unit_id],
     [Labour rate]
 )
 VALUES
@@ -375,7 +385,8 @@ VALUES
     GETDATE(), -- Created_at - datetime
     GETDATE(), -- Updated_at - datetime
     0,         -- Location_id - int
-    NULL,      -- image_url - varbinary
+    NULL, 
+	2,-- image_url - varbinary
     2          -- Labour rate - int
     )
 
@@ -490,6 +501,11 @@ CREATE TABLE dbo.[Product_RM_usage] (
       REFERENCES [Raw_Material]([Rawmaterial_Id])
 );
 
+ALTER TABLE dbo.Product_RM_usage
+ADD CONSTRAINT UQ_Product_RM_usage UNIQUE (Product_id,Rawmaterial_id)
+
+
+
 INSERT INTO dbo.Product_RM_usage
 (
     Product_id,
@@ -499,17 +515,17 @@ INSERT INTO dbo.Product_RM_usage
 VALUES
 (   1,   -- Product_id - int
     1,   -- Rawmaterial_id - int
-    15 -- Required_qty - decimal(18, 2)
+    0.05 -- Required_qty - decimal(18, 2)
     ),(  1,   -- Product_id - int
     2,   -- Rawmaterial_id - int
-    420 -- Required_qty - decimal(18, 2)
+    10 -- Required_qty - decimal(18, 2)
     ),(   1,   -- Product_id - int
     3,   -- Rawmaterial_id - int
-    100 -- Required_qty - decimal(18, 2)
+    0.10 -- Required_qty - decimal(18, 2)
     ),
 	( 1,   -- Product_id - int
     4,   -- Rawmaterial_id - int
-    150 -- Required_qty - decimal(18, 2)
+    1 -- Required_qty - decimal(18, 2)
     )
 
 DROP TABLE IF EXISTS dbo.[Subproduct_RM_usage]
@@ -542,6 +558,11 @@ CREATE TABLE dbo.[Product_Subproduct_relation] (
     FOREIGN KEY ([Product_id])
       REFERENCES [Product]([Product_Id])
 );
+
+
+
+ALTER TABLE dbo.Product_Subproduct_relation 
+ADD CONSTRAINT UQ_Product_Subproduct_relation UNIQUE (Product_id,SubProduct_id)
 
 INSERT INTO dbo.Product_Subproduct_relation
 (
