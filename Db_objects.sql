@@ -543,6 +543,18 @@ CREATE TABLE dbo.[Subproduct_RM_usage] (
       REFERENCES [Raw_Material]([Rawmaterial_Id])
 );
 
+INSERT INTO dbo.Subproduct_RM_usage
+(
+    Subproduct_id,
+    Rawmaterial_id,
+    Required_qty
+)
+VALUES
+(   1,   -- Subproduct_id - int
+    1,   -- Rawmaterial_id - int
+    0.5 -- Required_qty - decimal(18, 2)
+    ),(1,2,10)
+
 
 DROP TABLE IF EXISTS dbo.[Product_Subproduct_relation]
 CREATE TABLE dbo.[Product_Subproduct_relation] (
