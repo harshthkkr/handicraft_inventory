@@ -7,7 +7,7 @@ AS
 
 BEGIN
 
-DROP TABLE IF EXISTS #product_rm_sp
+DROP TABLE IF EXISTS #product_rm_sp_sub
 
 CREATE  TABLE #product_rm_sp (
 product_name VARCHAR(30),
@@ -39,7 +39,7 @@ SELECT p.Name AS product_name,'Subproduct' AS type,sp.Name AS Material,psr.Requi
   JOIN dbo.Measurement_unit mu ON mu.unit_id=sp.unit_id
 WHERE P.Product_id =@product_id
 
-SELECT * FROM #product_rm_sp
+SELECT * FROM #product_rm_sp_sub
 
 END
 
