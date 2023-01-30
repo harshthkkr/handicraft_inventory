@@ -588,3 +588,15 @@ VALUES
     2 -- Required_qty - decimal(18, 2)
     )
     
+    
+     ALTER TABLE Transaction_details
+ALTER COLUMN Rawmaterial_id INT NULL;
+
+  ALTER TABLE Transaction_details
+ALTER COLUMN Rawmaterial_id INT NULL;
+
+  ALTER TABLE [TRANSACTION]
+ALTER COLUMN Product_id INT NULL;
+
+  ALTER TABLE [TRANSACTION]
+ALTER COLUMN subproduct_id INT NULL;
