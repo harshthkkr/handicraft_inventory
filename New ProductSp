@@ -1,0 +1,72 @@
+--CREATE   PROC sp_getproduct_rm       
+----declare      
+--@product_id INT,        
+--@Qty int     
+--AS         
+      
+--ALTER   PROC sp_getproduct_rm      
+declare
+@product_id INT=1,        
+@Qty int = 10,
+@id int =3003
+--AS
+BEGIN        
+  if @id = 0
+  BEGIN
+  SELECT distinct p.Name AS product_name,'Rawmaterial' AS type,r.Name AS Material,PR.Required_qty*@Qty as Totalqty,mu.unit_type , 0.00 as Given_qty FROM        
+Product P      
+ JOIN dbo.Product_RM_usage PR ON p.Product_Id = PR.Product_id        
+ JOIN dbo.Raw_Material r ON r.Rawmaterial_Id=pr.Rawmaterial_id        
+ JOIN dbo.Measurement_unit mu ON mu.unit_id=r.unit_id        
+ 
+WHERE P.Product_id =@product_id        
+UNION        
+SELECT distinct p.Name AS product_name,'Subproduct' AS type,sp.Name AS Material,psr.Required_qty*@Qty as Totalqty,mu.unit_type,0.00 as Given_qty  FROM        
+ Product p        
+ JOIN dbo.Product_Subproduct_relation PSR ON p.Product_Id = PSR.Product_id        
+ JOIN dbo.Sub_Product sp ON sp.SubProduct_Id=PSR.SubProduct_id        
+  JOIN dbo.Measurement_unit mu ON mu.unit_id=sp.unit_id        
+    
+WHERE P.Product_id =@product_id        
+        
+  END
+  else
+  BEGIN
+
+  SELECT distinct p.Name AS product_name,'Rawmaterial' AS type,r.Name AS Material,0 as Totalqty,mu.unit_type , TD.Given_qty as Given_qty FROM  
+  [Transaction] T
+  inner join product P on P.Product_Id = T.Product_id
+  inner join Transaction_details TD on TD.Trx_id = T.Trx_id
+  left JOIN dbo.Raw_Material r ON r.Rawmaterial_Id=TD.Rawmaterial_id
+ left JOIN dbo.Measurement_unit mu ON mu.unit_id=r.unit_id 
+ 
+WHERE P.Product_id =@product_id  
+UNION        
+SELECT  p.Name AS product_name,'Subproduct' AS type,sp.Name AS Material,psr.Required_qty*@Qty as Totalqty,mu.unit_type,TD.Given_qty as Given_qty  FROM        
+ Product p        
+ JOIN dbo.Product_Subproduct_relation PSR ON p.Product_Id = PSR.Product_id        
+ JOIN dbo.Sub_Product sp ON sp.SubProduct_Id=PSR.SubProduct_id        
+  JOIN dbo.Measurement_unit mu ON mu.unit_id=sp.unit_id        
+   --inner join [Transaction] T on T.Product_id = P.Product_Id      
+   inner join Transaction_details TD on td.subproduct_id = sp.SubProduct_Id
+WHERE P.Product_id =@product_id    
+
+--SELECT distinct p.Name AS product_name,'Rawmaterial' AS type,r.Name AS Material,PR.Required_qty*@Qty as Totalqty,mu.unit_type , TD.Given_qty as Given_qty FROM        
+--Product P      
+-- JOIN dbo.Product_RM_usage PR ON p.Product_Id = PR.Product_id        
+-- JOIN dbo.Raw_Material r ON r.Rawmaterial_Id=pr.Rawmaterial_id        
+-- JOIN dbo.Measurement_unit mu ON mu.unit_id=r.unit_id        
+-- left join [Transaction] T on T.Product_id = P.Product_Id      
+-- inner join Transaction_details TD on td.Trx_id = T.Trx_id and t.Product_id = P.Product_Id 
+--WHERE P.Product_id =@product_id        
+--UNION        
+--SELECT distinct p.Name AS product_name,'Subproduct' AS type,sp.Name AS Material,psr.Required_qty*@Qty as Totalqty,mu.unit_type,TD.Given_qty as Given_qty  FROM        
+-- Product p        
+-- JOIN dbo.Product_Subproduct_relation PSR ON p.Product_Id = PSR.Product_id        
+-- JOIN dbo.Sub_Product sp ON sp.SubProduct_Id=PSR.SubProduct_id        
+--  JOIN dbo.Measurement_unit mu ON mu.unit_id=sp.unit_id        
+--   --inner join [Transaction] T on T.Product_id = P.Product_Id      
+--   inner join Transaction_details TD on td.subproduct_id = sp.SubProduct_Id
+--WHERE P.Product_id =@product_id        
+     END   
+END 
