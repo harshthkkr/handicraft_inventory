@@ -1,0 +1,18 @@
+DECLARE @member_id int
+
+SELECT t.Trx_id,m.F_Name +' ' + m.L_Name AS memeber_name,p.Name AS product,sp.Name as subproduct,t.Required_Qty,t.[Total_Weight given],
+t.Total_weight_recieved,t.Required_Qty,t.Order_date,t.Return_date,t.Actual_return_date,t.Is_completed
+FROM dbo.[Transaction] t
+LEFT JOIN dbo.Member m ON m.Member_id=t.member_id
+LEFT JOIN dbo.Product p ON p.Product_Id=t.Product_id
+LEFT JOIN dbo.Sub_Product sp ON sp.SubProduct_Id=t.subproduct_id
+WHERE m.Member_id= @member_id
+ 
+
+
+SELECT td.Trxdetails_id,r.Name,sp.Name,td.Required_qty,td.Given_qty,td.Is_pending FROM dbo.Transaction_details td
+LEFT JOIN dbo.[Transaction] t ON t.Trx_id=td.Trx_id
+LEFT JOIN dbo.Member m ON m.Member_id=t.member_id
+LEFT JOIN dbo.Raw_Material r ON r.Rawmaterial_Id=td.Rawmaterial_id
+LEFT JOIN dbo.Sub_Product sp ON sp.SubProduct_Id=td.subproduct_id
+WHERE m.Member_id= @member_id
