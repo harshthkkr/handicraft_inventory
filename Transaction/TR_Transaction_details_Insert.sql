@@ -1,4 +1,4 @@
-CREATE OR ALTER TRIGGER  Rm_update
+CREATE OR ALTER TRIGGER  TR_Transaction_details_Insert
 
 ON Transaction_details 
 AFTER INSERT
