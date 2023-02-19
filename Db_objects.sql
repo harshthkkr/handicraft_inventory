@@ -600,3 +600,26 @@ ALTER COLUMN Product_id INT NULL;
 
   ALTER TABLE [TRANSACTION]
 ALTER COLUMN subproduct_id INT NULL;
+
+DROP TABLE IF EXISTS Menus
+
+CREATE TABLE [dbo].[Menus](
+	[MenuId] [int] IDENTITY(1,1) NOT NULL,
+	[ParentMenuId] [int] NULL,
+	[Name] [varchar](100) NOT NULL,
+	[ImagePath] [varchar](100) NULL,
+	[Controller] [varchar](50) NULL,
+	[Action] [varchar](100) NULL,
+	[IsActive] [bit] NOT NULL,
+	[DispalyOrder] [int] NULL,
+ CONSTRAINT [PK_Menu] PRIMARY KEY CLUSTERED 
+(
+	[MenuId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+insert into Menus(ParentMenuId,Name,ImagePath,Controller,Action,IsActive,DispalyOrder)
+		   values 
+		   (0,'Products',null,'Products','Index',1,1)
