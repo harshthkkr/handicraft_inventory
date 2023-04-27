@@ -1,0 +1,1 @@
+select @@servername as test_1
