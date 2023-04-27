@@ -1,1 +1,1 @@
-select @@servername as test_1
+select @@servername
